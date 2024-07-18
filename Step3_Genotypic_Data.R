@@ -38,8 +38,8 @@ geno <- select.inds(geno, id %in% blues$germplasm)
 genoM <- as.matrix(geno)
 
 # Filtering molecular matrix
-genoM_filter <- qc.filtering(M=genoM, maf=0.05, marker.callrate = 0.2,
-                             ind.callrate = 0.33, impute = F, plots = T)
+genoM_filter <- qc.filtering(M=genoM, maf=0.05, marker.callrate = 0.25,
+                             ind.callrate = 0.5, impute = F, plots = T)
 
 # Calculate the G matrix
 G <- G.matrix(M=genoM_filter$M.clean, method = 'VanRaden', na.string = NA)$G
