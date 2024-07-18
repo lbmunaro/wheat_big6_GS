@@ -31,6 +31,7 @@ YTpheno_raw_w <- #raw data wide format
   read.csv('Data/2024-07-12T214129phenotype_download.csv') |> # read csv file
   clean_names() |> # clean names
   dplyr::filter(study_name!="Big6_Scb_23") |> #remove scab nursery
+  dplyr::filter(study_name!="Big6_Scb_23") |> #remove scab nursery
   remove_empty(which = c('cols')) |> #remove columns entirely empty
   dplyr::select(!contains("growth_stage")) |> #remove columns that contains "growth_stage"
   mutate(trial=paste(study_year,location_name,sep = ' '),
@@ -57,6 +58,7 @@ YTpheno_w <- YTpheno_raw_w |>
   mutate(grain_yield_bu_ac = ifelse(observation %in% c('Big6_Prn_23-257', 'Big6_Prn_23-32', 'Big6_Prn_23-333', 'Big6_Fre_23-60'), NA, grain_yield_bu_ac),
          test_weight_lb_bu = ifelse(observation %in% c('Big6_Prn_23-257', 'Big6_Prn_23-32', 'Big6_Prn_23-333', 'Big6_Prn_23-365', 'Big6_Prn_24-357', 'Big6_Prn_24-403'), NA, test_weight_lb_bu),
          plant_height_in = ifelse(observation == 'Big6_Urb_23-77', NA, plant_height_in)) |>
+  mutate(across(grain_yield_bu_ac:maturity_jd, ~if_else(germplasm=='FILL',NA,.))) |>
   # add row 56 & 57 col 34 from Big6_Urb_23.
   bind_rows(data.frame(year=as.factor(rep(2023,2)),
                        location=as.factor(rep('Urbana, IL',2)),
