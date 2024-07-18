@@ -28,7 +28,7 @@ convTwt<- function(y){
 
 ### Wide format ----
 YTpheno_raw_w <- #raw data wide format
-  read.csv('data/2024-07-12T214129phenotype_download.csv') |> # read csv file
+  read.csv('Data/2024-07-12T214129phenotype_download.csv') |> # read csv file
   clean_names() |> # clean names
   dplyr::filter(study_name!="Big6_Scb_23") |> #remove scab nursery
   remove_empty(which = c('cols')) |> #remove columns entirely empty
@@ -160,5 +160,40 @@ YTpheno_l |>
                        na.value='white') +
   theme_bw()
 
+
+# Map of the locations ----
+unique(YTpheno_w$location)
+
+library(maps)
+library(mapdata)
+library(ggrepel)
+
+locations <- data.frame(
+  city = c("Frankenmuth", "Fremont", "Ithaca", "West Lafayette", "Mason",
+           "Neoga", "Princeton", "Urbana", "Vincennes", "Wooster"),
+  state = c("MI", "OH", "NY", "IN", "MI", "IL", "KY", "IL", "IN", "OH"),
+  lat = c(43.3317, 41.3506, 42.4430, 40.4259, 42.5795,
+          39.4437, 37.8644, 40.1106, 38.6773, 40.8051),
+  lon = c(-83.7372, -83.1138, -76.5019, -86.9081, -84.4433,
+          -88.4528, -87.8669, -88.2073, -87.5286, -81.9381))
+
+# Get the map data for the US
+usa <- map_data("state")
+
+# Filter the map data to include only the specified states
+states_to_include <- c("new york", "ohio", "michigan", "indiana", "illinois", "kentucky")
+filtered_map_data <- usa %>% filter(region %in% states_to_include)
+
+# Create the map plot
+ggplot() +
+  geom_polygon(data = filtered_map_data, aes(x = long, y = lat, group = group), fill = "lightgray", color = "white") +
+  geom_point(data = locations, aes(x = lon, y = lat), color = "#FF5F0F", size = 1) +
+  geom_text_repel(data = locations, aes(x = lon, y = lat, label = city), size = 1.5, nudge_y = 0.2) +
+  coord_fixed(1.3) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x = "Longitude",y = "Latitude")
+ggsave('Figures/locations_map.png') # save plot
+
 # Save image
-save.image('Data/YT_pheno_data.RData')
+save.image('Data/Big6_pheno_data.RData')
