@@ -11,7 +11,7 @@ library(tidyverse) # R packages for data science
 library(asreml) # ASReml-R package
 
 # Load data ----
-load('Data/YT_pheno_data.RData')
+load('Data/Big6_pheno_data.RData')
 
 ## Check dataset ----
 YTpheno_l |>
