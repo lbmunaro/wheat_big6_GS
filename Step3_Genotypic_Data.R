@@ -10,13 +10,11 @@ rm(list=objects()) # clean workspace
 # Packages ----
 library(tidyverse) # R packages for data science
 library(gaston) # Genetic Data Handling
-#library(rrBLUP)    # R package for Ridge Regression and Best Linear Unbiased Prediction
-#library(Matrix)    # R package for sparse and dense matrix classes and methods
 library(ASRgenomics) # R package for Genomic Selection Analysis in R
 
 # Load data ----
 ## BLUES ----
-blues <- readRDS('data/Single_Trial_Blues.RDS')
+blues <- readRDS('Data/Single_Trial_Blues.RDS')
 
 geno <- read.vcf('Data/24NorGrain_23And24Big6_all_regions_Filtered.vcf.gz')
 
@@ -36,21 +34,15 @@ geno@ped$id<-gsub('KASKASKIA', 'Kaskaskia', geno@ped$id)
 # Get markers for the genotypes in the Big6 trials
 geno <- select.inds(geno, id %in% blues$germplasm)
 
-# Filter snps with maf > 0.05 to include only polymorphic snps
-#geno <- select.snps(geno, maf > 0.05)
-
 # Create molecular matrix
 genoM <- as.matrix(geno)
 
 # Filtering molecular matrix
 genoM_filter <- qc.filtering(M=genoM, maf=0.05, marker.callrate = 0.2,
                              ind.callrate = 0.33, impute = F, plots = T)
-dim(genoM_filter$M.clean)
-genoM_filter$M.clean[1:5,1:5]
 
 # Calculate the G matrix
 G <- G.matrix(M=genoM_filter$M.clean, method = 'VanRaden', na.string = NA)$G
-
 G[1:8,1:8]
 
 # Beding G matrix
@@ -60,7 +52,6 @@ G.bend[1:8,1:8]
 # Inverse of G matrix
 Ginv <- G.inverse(G=G.bend)$Ginv
 Ginv[1:8,1:8]
-det(Ginv)
 
 # Generate the three-column sparse form of the matrix Ginv
 Ginv.sparse <- G.inverse(G=G.bend, sparseform = T)$Ginv
@@ -79,3 +70,5 @@ match.kinship2pheno(K=Ginv, pheno.data = blues,
 
 # Save
 save(blues_filter, Ginv, Ginv.sparse, file='Data/Pheno_and_Gmat.RData')
+
+load('Data/Pheno_and_Gmat.RData')
