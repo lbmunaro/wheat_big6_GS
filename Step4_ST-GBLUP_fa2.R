@@ -142,14 +142,6 @@ GEBVs_ST_GBLUP_fa2_l <- data.frame() |>
   filter(!str_detect(rowname, 'study_')) |>
   separate(rowname, into = c('germplasm', 'study'), sep=':') |>
   glimpse()
-write.csv(GEBVs_ST_GBLUP_fa2_l,'Data/ST-GBLUP_fa2_gebvs_long.csv')
-
-GEBVs_ST_GBLUP_fa2_w <- GEBVs_ST_GBLUP_fa2_l |>
-    dplyr::select(trait,study,germplasm,solution) |>
-    pivot_wider(names_from = trait, values_from = solution) |>
-    arrange(desc(grain_yield_bu_ac)) |>
-    glimpse()
-write.csv(GEBVs_ST_GBLUP_fa2_w, 'Data/ST-GBLUP_fa2_gebvs_wide.csv')
 
 # Save ----
 save.image('Data/Step4_ST-GBLUP_fa2.RData')
