@@ -105,27 +105,6 @@ GEBVs_mod2_HT <- summary(mod2_HT, coef = T)$coef.random |>
 
 hist(GEBVs_mod2_HT$solution)
 
-# ### Maturity----
-# # model
-# mod2_MAT <- asreml(fixed=predicted.value~1,
-#                   random=~study+vm(germplasm, Ginv.sparse):fa(study,2),
-#                   weights=weight,
-#                   family=asr_gaussian(dispersion = 1),
-#                   data=,
-#                   na.action = na.method(y='omit', x='omit'),
-#                   workspace='4gb', maxit= 20)
-# mod2_MAT <- update.asreml(mod2_MAT)
-# mod2_MAT <- update.asreml(mod2_MAT)
-# mod2_MAT <- update.asreml(mod2_MAT)
-# 
-# # GEBVs
-# GEBVs_mod2_MAT <- summary(mod2_MAT, coef = T)$coef.random |>
-#   as.data.frame() |>
-#   rownames_to_column() |>
-#   glimpse()
-# 
-# hist(GEBVs_mod2_MAT$solution)
-
 save.image('Data/Step4_ST-GBLUP_fa2.RData')
 
 # Combine GEBVs ----
@@ -133,9 +112,7 @@ GEBVs_ST_GBLUP_fa2_l <- data.frame() |>
   bind_rows(GEBVs_mod2_YLD |> mutate(trait='grain_yield_bu_ac'),
             GEBVs_mod2_TW |> mutate(trait='test_weight_lb_bu'),
             GEBVs_mod2_HD |> mutate(trait='heading_time_jd'),
-            GEBVs_mod2_HT |> mutate(trait='plant_height_in'),
-#            GEBVs_mod2_MAT |> mutate(trait='maturity'),
-            ) |>
+            GEBVs_mod2_HT |> mutate(trait='plant_height_in')) |>
   mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
   mutate(rowname=str_remove(rowname,'fa\\(study, 2\\)_')) |>
   filter(!str_detect(rowname, c('Comp1|Comp2'))) |>
