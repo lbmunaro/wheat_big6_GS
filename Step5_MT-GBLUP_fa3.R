@@ -21,16 +21,29 @@ blues_group <- blues_filter |>
 
 # MT-GBLUP ----
 mod0_MT.GBLUP <- asreml(fixed = predicted.value ~ group,
-                        random = ~fa(group,3):vm(germplasm, Ginv.sparse),
+                        random = ~diag(group):vm(germplasm, Ginv.sparse),
                         weights = weight,
                         data = blues_group,
                         family = asr_gaussian(dispersion = 1),
-                        na.action = na.method(y='include',x='include'),
-                        workspace = '64gb', maxit= 20)
+                        na.action = na.method(y='include',x='omit'),
+                        workspace = '32gb', maxit= 20)
 
 mod0_MT.GBLUP <- update.asreml(mod0_MT.GBLUP)
 mod0_MT.GBLUP <- update.asreml(mod0_MT.GBLUP)
 mod0_MT.GBLUP <- update.asreml(mod0_MT.GBLUP)
+
+# MT-GBLUP fa3 ----
+modfa3_MT.GBLUP <- asreml(fixed = predicted.value ~ group,
+                        random = ~fa(group,3):vm(germplasm, Ginv.sparse),
+                        weights = weight,
+                        data = blues_group,
+                        family = asr_gaussian(dispersion = 1),
+                        na.action = na.method(y='include',x='omit'),
+                        workspace = '32gb', maxit= 20)
+
+modfa3_MT.GBLUP <- update.asreml(modfa3_MT.GBLUP)
+modfa3_MT.GBLUP <- update.asreml(modfa3_MT.GBLUP)
+modfa3_MT.GBLUP <- update.asreml(modfa3_MT.GBLUP)
 
 # Save ----
 save.image('Data/Step5_MT-GBLUP_fa3.RData')
