@@ -26,7 +26,7 @@ mod0_MT.GBLUP <- asreml(fixed = predicted.value ~ group,
                         data = blues_group,
                         family = asr_gaussian(dispersion = 1),
                         na.action = na.method(y='include',x='omit'),
-                        workspace = '32gb', maxit= 20)
+                        workspace = '16gb', maxit= 20)
 
 mod0_MT.GBLUP <- update.asreml(mod0_MT.GBLUP)
 mod0_MT.GBLUP <- update.asreml(mod0_MT.GBLUP)
