@@ -50,7 +50,9 @@ YTpheno_raw_w <- #raw data wide format
   mutate_at(vars(grain_yield_bu_ac:maturity_jd),as.numeric) |> #convert to numeric
   # replace 0 by NA for response variables
   mutate_at(vars(grain_yield_bu_ac:maturity_jd),
-            ~ifelse(.<=0,NA,.)) |>
+            ~ifelse(.<=0,NA,.)) |> # replace values <=0 by NA
+  filter(study!='Big6_Ith_24') |> # remove Ith_24 (don't have data yet)
+  droplevels() |>
   glimpse()
 
 YTpheno_w <- YTpheno_raw_w |>
