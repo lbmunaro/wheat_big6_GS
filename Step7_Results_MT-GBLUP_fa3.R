@@ -11,7 +11,7 @@ library(tidyverse) # R packages for data science
 library(corrplot) # A visual exploratory tool on correlation matrix
 
 # Load data ----
-load('Data/Step6_GEBVs_MT-GBLUP.RData')
+load('Data/Step6_GEBVs_MT-GBLUP_fa3.RData')
 
 # Check variance components ----
 summary(mod0_MT.GBLUP)$varcomp |>
@@ -94,6 +94,9 @@ GEBVs_MT_long <- GEBVs_MT |>
   left_join(eval_years) |>
   glimpse()
 
+
+summary(mod0_MT.GBLUP)$varcomp
+
 GEBVs_MT_long |> filter(!study%in%c('Big6_Vin_23','Big6_Ith_23','Big6_Neo_24','Big6_Laf_24')) |>
   filter(trait=='heading_time_jd') |>
   arrange(predicted.value) |>
@@ -147,7 +150,7 @@ coef <- summary(mod0_MT.GBLUP, coef = T)$coef.random |>
   mutate(germplasm=str_remove(germplasm,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
   filter(!str_detect(group, c('Comp1|Comp2|Comp3'))) |>
   select(group,germplasm,solution) |>
-  left_join(GEBVs_MT_long) |>
+#  left_join(GEBVs_MT_long) |>
   glimpse()
 
 # Plot
@@ -155,7 +158,11 @@ ggplot(coef,aes(x=predicted.value,y=solution)) +
   geom_point(mapping = aes(x = solution, y = predicted.value))
 
 
-hist(coef$solution)
+coef |>
+  ggplot() +
+  geom_histogram(aes(x=solution)) +
+  facet_wrap(~trait, scales = 'free', ncol = 2) +
+  theme_bw()
 
 hist(coef$predicted.value)
 
@@ -177,4 +184,23 @@ pheno |>
   left_join(coef) |>
   ggplot(aes(x=value,y=solution)) +
   geom_point()
+
+MT <- coef |>
+  filter(str_detect(group,'grain_yield')) |>
+  mutate(study=str_remove(group,'grain_yield_bu_ac_')) |>
+  arrange(study,germplasm) |>
+  glimpse()
+
+ST <- summary(mod1_gy, coef = T)$coef.random |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  mutate(rowname=str_remove(rowname,'fa\\(study, 2\\)_')) |>
+  filter(!str_detect(rowname, c('Comp1|Comp2'))) |>
+  filter(!str_detect(rowname, 'study_')) |>
+  separate(rowname, into = c('germplasm', 'study'), sep=':') |>
+  arrange(study,germplasm) |>
+  glimpse()
+
+plot(x=ST$solution, y=MT$solution)
 
