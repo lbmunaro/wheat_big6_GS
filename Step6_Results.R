@@ -209,7 +209,7 @@ CG <- cov2cor(VG) # Correlation matrix
 CG |> glimpse()
 
 ### Plot ----
-png('Results/gen_corr_YLD_MT-GBLUP_fa3.png', width = 16, height = 16, units = 'in', res = 320)
+png('Results/gen_corr_groups_MT-GBLUP_fa3.png', width = 16, height = 16, units = 'in', res = 320)
 par(mar = c(10, 4, 4, 2) + 0.1)  # Increase the bottom margin to avoid cutting off labels
 heatmap.2(CG, trace = "none", margins = c(10, 10))
 dev.off()
