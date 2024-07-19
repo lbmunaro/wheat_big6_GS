@@ -65,7 +65,7 @@ blues_filter <- blues |>
 # Check if Ginv and phenotypic data matches
 
 match.kinship2pheno(K=Ginv, pheno.data = blues,
-                    indiv = 'germplasm_name',
+                    indiv = 'germplasm',
                     clean = F, mism = F)
 
 # Save
