@@ -139,3 +139,143 @@ ASRgenomics::kinship.heatmap(K=CG_selected, dendrogram = T, col.label = T)
 
 load('Data/troubleshooting.RData')
 
+
+
+load('Data/troubleshooting.RData')
+
+# mod 0
+GEBVs_mod0_gy |>
+  glimpse()
+
+GEBVs <- summary(mod0_gy, coef = T)$coef.random
+
+test0 <- GEBVs |>
+  as.data.frame() |>
+  rownames_to_column('germplasm') |>
+  mutate(germplasm=str_remove(germplasm,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  rename(se=std.error) |>
+  left_join(GEBVs_mod0_gy) |>
+  glimpse()
+
+ggplot(test0) +
+  geom_point(aes(x=predicted.value,y=solution))
+
+ggplot(test0) +
+  geom_point(aes(x=std.error,y=se))
+
+# mod1
+GEBVs_mod1_gy |>
+  glimpse()
+
+GEBVs1 <- summary(mod1_gy, coef = T)$coef.random
+
+test1 <- GEBVs1 |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  mutate(rowname=str_remove(rowname,'fa\\(study, 2\\)_')) |>
+  filter(!str_detect(rowname, c('Comp1|Comp2'))) |>
+  filter(!str_detect(rowname, 'study_')) |>
+  separate(rowname, into = c('germplasm', 'study'), sep=':') |>
+  mutate_at(vars(germplasm,study),~as.factor(.x)) |>
+  rename(ST_coef = solution) |>
+  select(germplasm, study, ST_coef) |>
+  arrange(study,germplasm) |>
+  glimpse()
+
+testpheno <- summary(pheno_mod1_gy, coef=T)$coef.random |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'fa\\(study, 2\\)_')) |>
+  mutate(rowname=str_remove(rowname,'germplasm_')) |>
+  filter(!str_detect(rowname, c('Comp1|Comp2'))) |>
+  filter(!str_detect(rowname, 'study_')) |>
+  separate(rowname, into = c('study', 'germplasm'), sep=':') |>
+  mutate_at(vars(germplasm,study),~as.factor(.x)) |>
+  rename(PH_coef=solution) |>
+  select(germplasm, study, PH_coef) |>
+  arrange(study,germplasm) |>
+  glimpse()
+
+ggplot(test1) +
+  geom_histogram(aes(x=ST_coef))
+
+ggplot(testpheno) +
+  geom_histogram(aes(x=PH_coef))
+
+
+test1 |>
+  left_join(testpheno) |>
+  ggplot(aes(x=ST_coef,y=PH_coef)) +
+  geom_point()
+
+
+
+### Compare ST-GBLUP models
+load('Data/troubleshooting.RData')
+
+mod0_gy$loglik
+mod1_gy$loglik
+mod2_gy$loglik
+mod3_gy$loglik
+
+
+GEBVs1 <- summary(mod1_gy, coef = T)$coef.random |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  mutate(rowname=str_remove(rowname,'fa\\(study, 2\\)_')) |>
+  filter(!str_detect(rowname, c('Comp1|Comp2'))) |>
+  filter(!str_detect(rowname, 'study_')) |>
+  separate(rowname, into = c('germplasm', 'study'), sep=':') |>
+  arrange(study,germplasm) |>
+  select(study,germplasm,solution) |>
+  rename(GEBVs1=solution) |>
+  glimpse()
+GEBVs1
+
+GEBVs2 <- summary(mod2_gy, coef = T)$coef.random |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  mutate(rowname=str_remove(rowname,'study_')) |>
+  separate(rowname, into = c('germplasm', 'study'), sep=':') |>
+  filter(!is.na(study)) |>
+  arrange(study,germplasm) |>
+  select(study,germplasm,solution) |>
+  rename(GEBVs2=solution) |>
+  glimpse()
+GEBVs2
+
+GEBVs3 <- summary(mod3_gy, coef = T)$coef.random |>
+  as.data.frame() |>
+  rownames_to_column() |>
+  mutate(rowname=str_remove(rowname,'vm\\(germplasm, Ginv\\.sparse\\)_')) |>
+  mutate(rowname=str_remove(rowname,'study_')) |>
+  separate(rowname, into = c('germplasm', 'study'), sep=':') |>
+  filter(!is.na(study)) |>
+  arrange(study,germplasm) |>
+  select(study,germplasm,solution) |>
+  rename(GEBVs3=solution) |>
+  glimpse()
+GEBVs3
+
+GEBVs_ST <- GEBVs1 |>
+  left_join(GEBVs2) |>
+  left_join(GEBVs3) |>
+  glimpse()
+
+GEBVs_ST |>
+  ggplot(aes(x=GEBVs1,y=GEBVs2)) +
+  geom_point()
+
+GEBVs_ST |>
+  ggplot(aes(x=GEBVs1,y=GEBVs3)) +
+  geom_point()
+
+GEBVs_ST |>
+  ggplot(aes(x=GEBVs2,y=GEBVs3)) +
+  geom_point()
+
+summary(mod2_gy)$varcomp
+
