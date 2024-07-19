@@ -112,8 +112,8 @@ blues <- YTpheno_l |>
   summarise_at(vars(year, location, trial), ~unique(.x)) |>
   left_join(blues) |>
   filter(germplasm!='FILL') |>
+  filter(!is.na(predicted.value)) |>
   glimpse()
-
 
 # Save blues ----
 saveRDS(blues, file = 'Data/Single_Trial_Blues.RDS')
